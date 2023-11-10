@@ -1,11 +1,11 @@
 %include 'in_out.asm'
 section .data
 msg1 db 'Введите B: ',0h
-msg2 db "Наибольшее число: ",0h
-A dd '20'
-C dd '50'
+msg2 db "Наименьшее число: ",0h
+A dd '8'
+C dd '68'
 section .bss
-max resb 10
+min resb 10
 B resb 10
 section .text
 global _start
@@ -21,29 +21,30 @@ call sread
 mov eax,B
 call atoi ; Вызов подпрограммы перевода символа в число
 mov [B],eax ; запись преобразованного числа в 'B'
-; ---------- Записываем 'A' в переменную 'max'
+; ---------- Записываем 'A' в переменную 'min'
 mov ecx,[A] ; 'ecx = A'
-mov [max],ecx ; 'max = A'
+mov [min],ecx ; 'min = A'
 ; ---------- Сравниваем 'A' и 'С' (как символы)
 cmp ecx,[C] ; Сравниваем 'A' и 'С'
-jg check_B ; если 'A>C', то переход на метку 'check_B',
+jl check_B ; если 'A<C', то переход на метку 'check_B',
 mov ecx,[C] ; иначе 'ecx = C'
-mov [max],ecx ; 'max = C'
-; ---------- Преобразование 'max(A,C)' из символа в число
+mov [min],ecx ; 'max = C'
+; ---------- Преобразование 'min(A,C)' из символа в число
 check_B:
-mov eax,max
+mov eax,min
 call atoi ; Вызов подпрограммы перевода символа в число
-mov [max],eax ; запись преобразованного числа в `max`
-; ---------- Сравниваем 'max(A,C)' и 'B' (как числа)
-mov ecx,[max]
-cmp ecx,[B] ; Сравниваем 'max(A,C)' и 'B'
-jg fin ; если 'max(A,C)>B', то переход на 'fin',
+mov [min],eax ; запись преобразованного числа в `min`
+; ---------- Сравниваем 'min(A,C)' и 'B' (как числа)
+mov ecx,[min]
+cmp ecx,[B] ; Сравниваем 'min(A,C)' и 'B'
+jl fin ; если 'min(A,C)<B', то переход на 'fin',
 mov ecx,[B] ; иначе 'ecx = B'
-mov [max],ecx
+mov [min],ecx
 ; ---------- Вывод результата
 fin:
 mov eax, msg2
-call sprint ; Вывод сообщения 'Наибольшее число: '
-mov eax,[max]
-call iprintLF ; Вывод 'max(A,B,C)'
+call sprint ; Вывод сообщения 'Наименьшее число: '
+mov eax,[min]
+call iprintLF ; Вывод 'min(A,B,C)'
 call quit ; Выход
+
